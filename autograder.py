@@ -17,7 +17,7 @@ SCORE_TO_GIVE = 1
 base_url = f"{CANVAS_DOMAIN}/api/v1"
 headers = {"Authorization": f"Bearer {ACCESS_TOKEN}"}
 
-DRY_RUN = True
+DRY_RUN = False
 
 def get_submissions(course_id, assignment_id):
     url = f"{base_url}/courses/{course_id}/assignments/{assignment_id}/submissions"
@@ -58,7 +58,7 @@ def grade_submission(submission, assignment_id):
         print(f"[DRY RUN] Would grade {submission.get('user',{}).get('name','Unknown')} with {SCORE_TO_GIVE} points")
         return True
     else:
-        url = f"{base_url}/courses/{submission['course_id']}/assignments/{assignment_id}/submissions/{submission['user_id']}"
+        url = f"{base_url}/courses/{COURSE_ID}/assignments/{assignment_id}/submissions/{submission['user_id']}"
         grade_data = {"submission": {"posted_grade": str(SCORE_TO_GIVE)}}
         response = requests.put(url, headers=headers, json=grade_data, timeout=10)
         if response.status_code in (200, 201):
