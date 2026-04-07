@@ -9,7 +9,7 @@ CANVAS_DOMAIN = "https://uwlac.instructure.com"
 ACCESS_TOKEN = os.environ["CANVAS_TOKEN"]
 
 COURSE_ID = 831226
-ASSIGNMENT_ID = 9754940
+ASSIGNMENT_ID = 9754941
 
 WORD_COUNT_MIN = 100
 SCORE_TO_GIVE = 1
@@ -79,7 +79,8 @@ def main():
 
     print(f"Processing {len(submissions)} submissions...")
     graded_count = 0
-    skipped_count = 0
+    already_graded_count = 0
+    below_threshold_count = 0
 
     for sub in submissions:
         user_name = sub.get('user', {}).get('name', 'Unknown')
@@ -88,7 +89,7 @@ def main():
         # Skip if already graded
         if sub.get('grade') is not None:
             print(f"Skipping {user_name} (already graded with grade: {sub['grade']})")
-            skipped_count += 1
+            already_graded_count += 1
             continue
 
         submission_text = sub.get('body', '')
@@ -105,15 +106,17 @@ def main():
                 print(f"Failed to grade {user_name}")
         else:
             print(f"Below word count threshold, skipping {user_name}")
-            skipped_count += 1
+            below_threshold_count += 1
 
         time.sleep(0.5)  # avoid rate limits
 
     # Summary
     print("\nGrading Summary:")
     print(f"Total submissions: {len(submissions)}")
-    print(f"Graded: {graded_count}")
-    print(f"Skipped: {skipped_count}")
+    print(f"Graded this run: {graded_count}")
+    print(f"Already graded: {already_graded_count}")
+    print(f"Below threshold: {below_threshold_count}")
+    print(f"Total graded on Canvas: {graded_count + already_graded_count}")
 
 if __name__ == "__main__":
     main()
