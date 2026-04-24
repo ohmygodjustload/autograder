@@ -5,19 +5,29 @@ Automatically grades Canvas LMS assignments based on a minimum word count. Fetch
 ## Setup
 
 1. **Install dependencies:**
-  ```
-   pip install requests
-  ```
+
+   ```
+   pip install requests python-dotenv
+   ```
+
 2. **Configure your Canvas API token:**
-  Create a `.env` file in the project root (this file is gitignored):
-   Then set it in your shell before running:
+
+   Create a `.env` file in the project root (already gitignored):
+
+   ```
+   CANVAS_TOKEN=your_canvas_api_token_here
+   ```
+
+   The script loads this automatically on startup — no shell setup needed.
+
 3. **Edit `autograder.py`** to set your course and assignment:
-  ```python
+
+   ```python
    COURSE_ID = 831226
    ASSIGNMENT_ID = 9754940
    WORD_COUNT_MIN = 100
    SCORE_TO_GIVE = 1
-  ```
+   ```
 
 ## Usage
 
@@ -38,7 +48,7 @@ Set `DRY_RUN = False`, then run the same command. Already-graded submissions are
 A submission earns a grade if it contains at least `WORD_COUNT_MIN` words. The word counter:
 
 - Strips HTML tags (Canvas submissions are HTML)
-- Decodes HTML entities (`&`,  ``, etc.)
+- Decodes HTML entities (`&amp;`, `&nbsp;`, etc.)
 - Removes URLs so they don't inflate the count
 - Counts only tokens containing at least one alphanumeric character (filters out stray punctuation)
 - Treats hyphenated words (e.g. "well-known") as a single word

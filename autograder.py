@@ -3,13 +3,16 @@ import requests
 import time
 import html
 import re
+from dotenv import load_dotenv
+
+load_dotenv()
 
 CANVAS_DOMAIN = "https://uwlac.instructure.com"
 
 ACCESS_TOKEN = os.environ["CANVAS_TOKEN"]
 
 COURSE_ID = 831226
-ASSIGNMENT_ID = 9754941
+ASSIGNMENT_ID = 9754929
 
 WORD_COUNT_MIN = 100
 SCORE_TO_GIVE = 1
@@ -17,7 +20,7 @@ SCORE_TO_GIVE = 1
 base_url = f"{CANVAS_DOMAIN}/api/v1"
 headers = {"Authorization": f"Bearer {ACCESS_TOKEN}"}
 
-DRY_RUN = False
+DRY_RUN = True # Set to False to actually grade submissions
 
 def get_submissions(course_id, assignment_id):
     url = f"{base_url}/courses/{course_id}/assignments/{assignment_id}/submissions"
@@ -68,19 +71,30 @@ def grade_submission(submission, assignment_id):
             return False
 
 def main():
+    total_start = time.time()
+
     print("Starting autograder...")
     print(f"Course ID: {COURSE_ID}, Assignment ID: {ASSIGNMENT_ID}")
-
     print("Fetching submissions...")
+
+    fetch_start = time.time()
     submissions = get_submissions(COURSE_ID, ASSIGNMENT_ID)
+    fetch_elapsed = time.time() - fetch_start
+
     if submissions is None:
         print("Failed to fetch submissions. Exiting.")
+        print(f"\nTime Taken:")
+        print(f"  Fetching: {fetch_elapsed:>7.2f} seconds")
+        print(f"  Total: {time.time() - total_start:>7.2f} seconds")
         return
 
     print(f"Processing {len(submissions)} submissions...")
+
     graded_count = 0
     already_graded_count = 0
     below_threshold_count = 0
+
+    grade_start = time.time()
 
     for sub in submissions:
         user_name = sub.get('user', {}).get('name', 'Unknown')
@@ -109,6 +123,8 @@ def main():
             below_threshold_count += 1
 
         time.sleep(0.5)  # avoid rate limits
+    
+    grade_elapsed = time.time() - grade_start
 
     # Summary
     print("\nGrading Summary:")
@@ -117,6 +133,12 @@ def main():
     print(f"Already graded: {already_graded_count}")
     print(f"Below threshold: {below_threshold_count}")
     print(f"Total graded on Canvas: {graded_count + already_graded_count}")
+
+    total_elapsed = time.time() - total_start
+    print(f"\nTime Taken:")
+    print(f"  Fetching: {fetch_elapsed:>7.2f} seconds")
+    print(f"  Grading: {grade_elapsed:>7.2f} seconds")
+    print(f"  Total: {total_elapsed:>7.2f} seconds")
 
 if __name__ == "__main__":
     main()
