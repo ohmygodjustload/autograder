@@ -12,7 +12,7 @@ CANVAS_DOMAIN = "https://uwlac.instructure.com"
 ACCESS_TOKEN = os.environ["CANVAS_TOKEN"]
 
 COURSE_ID = 831226
-ASSIGNMENT_ID = 9754929
+ASSIGNMENT_ID = 9754931
 
 WORD_COUNT_MIN = 100
 SCORE_TO_GIVE = 1
@@ -20,7 +20,7 @@ SCORE_TO_GIVE = 1
 base_url = f"{CANVAS_DOMAIN}/api/v1"
 headers = {"Authorization": f"Bearer {ACCESS_TOKEN}"}
 
-DRY_RUN = True # Set to False to actually grade submissions
+DRY_RUN = False # Set to False to actually grade submissions ,
 
 def get_submissions(course_id, assignment_id):
     url = f"{base_url}/courses/{course_id}/assignments/{assignment_id}/submissions"
